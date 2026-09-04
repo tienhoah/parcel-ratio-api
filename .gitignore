@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# .NET build output
+bin/
+obj/
+
+# .NET user-specific files
+*.user
+.vs/
+
+# EF Core migrations are fine to commit — do NOT ignore Migrations/
+
+# Environment / secrets
+.env
+appsettings.Development.json
