@@ -10,4 +10,8 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Data\parcels.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
