@@ -6,12 +6,16 @@ namespace ParcelApi.Services;
 public class JsonParcelService : IParcelService
 {
     private readonly List<Parcel> _parcels;
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public JsonParcelService()
     {
         var path = Path.Combine(AppContext.BaseDirectory, "Data", "parcels.json");
         var json = File.ReadAllText(path);
-        _parcels = JsonSerializer.Deserialize<List<Parcel>>(json) ?? [];
+        _parcels = JsonSerializer.Deserialize<List<Parcel>>(json, JsonOptions) ?? [];
     }
 
     public IEnumerable<Parcel> GetAll(int page, int pageSize)
