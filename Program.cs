@@ -1,4 +1,6 @@
 using ParcelApi.Services;
+using ParcelApi.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IParcelService, JsonParcelService>();
+builder.Services.AddDbContext<ParcelDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("ParcelDb")));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
