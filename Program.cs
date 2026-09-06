@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IParcelService, JsonParcelService>();
+builder.Services.AddScoped<IParcelService, EfParcelService>();
 builder.Services.AddDbContext<ParcelDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("ParcelDb")));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

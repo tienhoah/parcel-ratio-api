@@ -1,31 +1,26 @@
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using ParcelApi.Data;
 using ParcelApi.Models;
 
 namespace ParcelApi.Services;
 
-public class JsonParcelService : IParcelService
+public class EfParcelService : IParcelService
 {
-    private readonly List<Parcel> _parcels;
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
+    private readonly ParcelDbContext _context;
 
-    public JsonParcelService()
+    public EfParcelService(ParcelDbContext context)
     {
-        var path = Path.Combine(AppContext.BaseDirectory, "Data", "parcels.json");
-        var json = File.ReadAllText(path);
-        _parcels = JsonSerializer.Deserialize<List<Parcel>>(json, JsonOptions) ?? [];
+        _context = context;
     }
 
     public IEnumerable<Parcel> GetAll(int page, int pageSize)
     {
-        return _parcels.Skip((page - 1) * pageSize).Take(pageSize);
+        return _context.Parcels.OrderBy(p => p.Id).Skip((page - 1) * pageSize).Take(pageSize);
     }
 
     public Parcel? GetById(string id)
     {
-        return _parcels.FirstOrDefault(p => p.Id == id);
+        return _context.Parcels.FirstOrDefault(p => p.Id == id);
     }
 
     private static double Distance(Parcel a, Parcel b)
@@ -37,14 +32,15 @@ public class JsonParcelService : IParcelService
 
     public IEnumerable<Parcel> GetComparables(string id)
     {
-        var target = _parcels.FirstOrDefault(p => p.Id == id);
+        var target = _context.Parcels.FirstOrDefault(p => p.Id == id);
         if (target is null) return [];
 
-        return _parcels
+        return _context.Parcels
             .Where(p => p.Id != target.Id)
-            .Where(p => p.LastSalePrice is not null)
+            .Where(p => p.LastSalePrice != null)
             .Where(p => p.Neighbourhood == target.Neighbourhood)
-            .OrderBy(p => Distance(p, target))
+            .ToList()
+            .OrderBy(p => Distance(target, p))
             .Take(5);
     }
 
@@ -64,7 +60,7 @@ public class JsonParcelService : IParcelService
 
     public (IEnumerable<Parcel> Parcels, double MedianRatio, double Cod) GetWithinBoundingBox(double minLat, double minLon, double maxLat, double maxLon)
     {
-        var parcelsInBox = _parcels
+        var parcelsInBox = _context.Parcels
             .Where(p => p.Latitude >= minLat && p.Latitude <= maxLat)
             .Where(p => p.Longitude >= minLon && p.Longitude <= maxLon)
             .ToList();
