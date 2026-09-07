@@ -10,7 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<IParcelService, EfParcelService>();
-builder.Services.AddDbContext<ParcelDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("ParcelDb")));
+builder.Services.AddDbContext<ParcelDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ParcelDb"),
+        o => o.UseNetTopologySuite()));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
