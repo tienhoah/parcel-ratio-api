@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 using ParcelApi.Data;
 using ParcelApi.Models;
 
@@ -60,9 +62,12 @@ public class EfParcelService : IParcelService
 
     public (IEnumerable<Parcel> Parcels, double MedianRatio, double Cod) GetWithinBoundingBox(double minLat, double minLon, double maxLat, double maxLon)
     {
+        var box = new Envelope(minLon, maxLon, minLat, maxLat);
+        var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(4326);
+        var boundingBox = geometryFactory.ToGeometry(box);
+
         var parcelsInBox = _context.Parcels
-            .Where(p => p.Latitude >= minLat && p.Latitude <= maxLat)
-            .Where(p => p.Longitude >= minLon && p.Longitude <= maxLon)
+            .Where(p => boundingBox.Intersects(p.Location))
             .ToList();
 
         var ratios = parcelsInBox

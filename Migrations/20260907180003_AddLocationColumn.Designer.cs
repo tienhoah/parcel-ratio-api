@@ -13,7 +13,7 @@ using ParcelApi.Data;
 namespace ParcelApi.Migrations
 {
     [DbContext(typeof(ParcelDbContext))]
-    [Migration("20260907073020_AddLocationColumn")]
+    [Migration("20260907180003_AddLocationColumn")]
     partial class AddLocationColumn
     {
         /// <inheritdoc />
@@ -58,7 +58,9 @@ namespace ParcelApi.Migrations
                         .HasColumnType("double precision");
 
                     b.Property<Point>("Location")
-                        .HasColumnType("geometry");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("geometry")
+                        .HasComputedColumnSql("ST_SetSRID(ST_MakePoint(\"Longitude\", \"Latitude\"), 4326)", true);
 
                     b.Property<double>("Longitude")
                         .HasColumnType("double precision");
@@ -71,6 +73,10 @@ namespace ParcelApi.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Location");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Location"), "GIST");
 
                     b.ToTable("Parcels");
                 });
