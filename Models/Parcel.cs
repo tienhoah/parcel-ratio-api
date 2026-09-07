@@ -14,4 +14,6 @@ public class Parcel
     public decimal AssessedValue { get; set; }
     public decimal? LastSalePrice { get; set; }
     public DateOnly? LastSaleDate { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore]
+    public NetTopologySuite.Geometries.Point? Location { get; set; }
 }
