@@ -13,9 +13,11 @@ builder.Services.AddScoped<IParcelService, EfParcelService>();
 builder.Services.AddDbContext<ParcelDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ParcelDb"),
         o => o.UseNetTopologySuite()));
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? ["http://localhost:4200"];
 builder.Services.AddCors(options =>
     options.AddPolicy("web", policy =>
-        policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader()));
+        policy.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader()));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
